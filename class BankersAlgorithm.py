@@ -5,4 +5,6 @@ class BankersAlgorithm:
         self.available = available
         self.max_need = max_need
         self.allocation = allocation
+        self.need = [[self.max_need[i][j] - self.allocation[i][j] for j in range(len(resources))] for i in range(len(processes))]
+
 
