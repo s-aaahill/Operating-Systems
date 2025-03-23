@@ -30,3 +30,23 @@ class DeadlockToolkitApp:
         self.available_label.grid(row=2, column=0, sticky=tk.W, pady=5)
         self.available_entry = ttk.Entry(self.main_frame, width=50)
         self.available_entry.grid(row=2, column=1, pady=5)
+        self.resources_label = ttk.Label(self.main_frame, text="Resources (comma-separated):")
+        self.resources_label.grid(row=1, column=0, sticky=tk.W, pady=5)
+        self.resources_entry = ttk.Entry(self.main_frame, width=50)
+        self.resources_entry.grid(row=1, column=1, pady=5)
+
+        self.available_label = ttk.Label(self.main_frame, text="Available Resources (comma-separated):")
+        self.available_label.grid(row=2, column=0, sticky=tk.W, pady=5)
+        self.available_entry = ttk.Entry(self.main_frame, width=50)
+        self.available_entry.grid(row=2, column=1, pady=5)
+
+        self.max_need_label = ttk.Label(self.main_frame, text="Max Need (rows for processes, comma-separated):")
+        self.max_need_label.grid(row=3, column=0, sticky=tk.W, pady=5)
+        self.max_need_entry = ttk.Entry(self.main_frame, width=50)
+        self.max_need_entry.grid(row=3, column=1, pady=5)
+
+        self.allocation_label = ttk.Label(self.main_frame, text="Allocation (rows for processes, comma-separated):")
+        self.allocation_label.grid(row=4, column=0, sticky=tk.W, pady=5)
+        self.allocation_entry = ttk.Entry(self.main_frame, width=50)
+        self.allocation_entry.grid(row=4, column=1, pady=5)
+
