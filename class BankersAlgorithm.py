@@ -15,6 +15,10 @@ class BankersAlgorithm:
             found = False
             for i in range(len(self.processes)):
                 if not finish[i] and all(self.need[i][j] <= work[j] for j in range(len(self.resources))):
+                    work = [work[j] + self.allocation[i][j] for j in range(len(self.resources))]
+                    finish[i] = True
+                    safe_sequence.append(self.processes[i])
+                    found = True
                     
 
 
