@@ -19,6 +19,13 @@ class BankersAlgorithm:
                     finish[i] = True
                     safe_sequence.append(self.processes[i])
                     found = True
+             if not found:
+                break
+
+        if all(finish):
+            return True, safe_sequence
+        else:
+            return False, []
                     
 
 
