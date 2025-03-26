@@ -49,4 +49,45 @@ class DeadlockToolkitApp:
         self.allocation_label.grid(row=4, column=0, sticky=tk.W, pady=5)
         self.allocation_entry = ttk.Entry(self.main_frame, width=50)
         self.allocation_entry.grid(row=4, column=1, pady=5)
+        # Buttons Frame
+        self.buttons_frame = ttk.Frame(self.main_frame)
+        self.buttons_frame.grid(row=5, column=0, columnspan=2, pady=20)
 
+        self.check_safe_button = ttk.Button(self.buttons_frame, text="Check Safe State", command=self.check_safe_state)
+        self.check_safe_button.grid(row=0, column=0, padx=10)
+
+        self.detect_deadlock_button = ttk.Button(self.buttons_frame, text="Detect Deadlock", command=self.detect_deadlock)
+        self.detect_deadlock_button.grid(row=0, column=1, padx=10)
+
+        self.draw_graph_button = ttk.Button(self.buttons_frame, text="Draw Resource Allocation Graph", command=self.draw_graph)
+        self.draw_graph_button.grid(row=0, column=2, padx=10)
+
+        self.terminate_process_button = ttk.Button(self.buttons_frame, text="Terminate Process", command=self.terminate_process)
+        self.terminate_process_button.grid(row=1, column=0, padx=10, pady=10)
+
+        self.preempt_resource_button = ttk.Button(self.buttons_frame, text="Preempt Resource", command=self.preempt_resource)
+        self.preempt_resource_button.grid(row=1, column=1, padx=10, pady=10)
+
+        self.export_graph_button = ttk.Button(self.buttons_frame, text="Export Graph", command=self.export_graph)
+        self.export_graph_button.grid(row=1, column=2, padx=10, pady=10)
+
+        self.export_results_button = ttk.Button(self.buttons_frame, text="Export Results", command=self.export_results)
+        self.export_results_button.grid(row=1, column=3, padx=10, pady=10)
+
+    def check_safe_state(self):
+        try:
+            processes = self.processes_entry.get().split(',')
+            resources = self.resources_entry.get().split(',')
+            available = list(map(int, self.available_entry.get().split(',')))
+            max_need = [list(map(int, row.split(','))) for row in self.max_need_entry.get().split(';')]
+            allocation = [list(map(int, row.split(','))) for row in self.allocation_entry.get().split(';')]
+
+            banker = BankersAlgorithm(processes, resources, available, max_need, allocation)
+            is_safe, safe_sequence = banker.is_safe()
+
+            if is_safe:
+                messagebox.showinfo("Safe State", f"The system is in a safe state. Safe sequence: {safe_sequence}")
+            else:
+                messagebox.showwarning("Unsafe State", "The system is in an unsafe state. Deadlock may occur.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Invalid input: {e}")
