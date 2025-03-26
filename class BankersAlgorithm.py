@@ -26,6 +26,21 @@ class BankersAlgorithm:
             return True, safe_sequence
         else:
             return False, []
+# Deadlock Detection
+def detect_deadlock(allocation, request, available):
+    num_processes = len(allocation)
+    num_resources = len(available)
+    work = available.copy()
+    finish = [False] * num_processes
+
+    while True:
+        found = False
+        for i in range(num_processes):
+            if not finish[i] and all(request[i][j] <= work[j] for j in range(num_resources)):
+                work = [work[j] + allocation[i][j] for j in range(num_resources)]
+                finish[i] = True
+                found = True
+
                     
 
 
