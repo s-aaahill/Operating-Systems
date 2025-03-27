@@ -92,7 +92,6 @@ class DeadlockToolkitApp:
             self.max_need_entry.get(),
             self.allocation_entry.get()
         )
-
         # Generate request matrix from need matrix (example)
         need = [
             [max_need[i][j] - allocation[i][j] for j in range(len(resources))]
