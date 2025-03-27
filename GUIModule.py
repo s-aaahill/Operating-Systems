@@ -83,5 +83,30 @@ class DeadlockToolkitApp:
                 messagebox.showwarning("Unsafe State", "System is in unsafe state")
         except ValueError as e:
             messagebox.showerror("Input Error", str(e))
+    def detect_deadlock(self):
+    try:
+        processes, resources, available, max_need, allocation = parse_input(
+            self.processes_entry.get(),
+            self.resources_entry.get(),
+            self.available_entry.get(),
+            self.max_need_entry.get(),
+            self.allocation_entry.get()
+        )
+
+        # Generate request matrix from need matrix (example)
+        need = [
+            [max_need[i][j] - allocation[i][j] for j in range(len(resources))]
+            for i in range(len(processes))
+        ]
+        
+        deadlock_detected = detect_deadlock(allocation, need, available)
+
+        if deadlock_detected:
+            messagebox.showwarning("Deadlock Detected", "Deadlock has been detected!")
+        else:
+            messagebox.showinfo("No Deadlock", "No deadlock detected.")
+    
+    except ValueError as e:
+        messagebox.showerror("Input Error", str(e))
 
     # Other methods follow similar pattern...
