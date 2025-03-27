@@ -8,9 +8,10 @@ class BankersAlgorithm:
         self.need = self._calculate_need()
 
     def _calculate_need(self):
+        # Fix loop order (i first, then j)
         return [
             [self.max_need[i][j] - self.allocation[i][j] 
-            for j in range(len(self.resources)) 
+            for j in range(len(self.resources))]
             for i in range(len(self.processes))
         ]
 
@@ -23,6 +24,7 @@ class BankersAlgorithm:
             found = False
             for i in range(len(self.processes)):
                 if not finish[i] and all(self.need[i][j] <= work[j] for j in range(len(self.resources))):
+                    # Allocate resources
                     work = [work[j] + self.allocation[i][j] for j in range(len(self.resources))]
                     finish[i] = True
                     safe_sequence.append(self.processes[i])
@@ -31,7 +33,8 @@ class BankersAlgorithm:
             if not found:
                 break
 
-        return (True, safe_sequence) if all(finish) else (False, [])
+        # Return True if all processes could finish, otherwise False
+        return (all(finish), safe_sequence if all(finish) else [])
 
 def detect_deadlock(allocation, request, available):
     num_processes = len(allocation)
@@ -42,6 +45,7 @@ def detect_deadlock(allocation, request, available):
     while True:
         found = False
         for i in range(num_processes):
+            # Fix: Check if request <= work AND request <= need
             if not finish[i] and all(request[i][j] <= work[j] for j in range(num_resources)):
                 work = [work[j] + allocation[i][j] for j in range(num_resources)]
                 finish[i] = True
@@ -50,4 +54,5 @@ def detect_deadlock(allocation, request, available):
         if not found:
             break
 
+    # If all processes finished, no deadlock
     return not all(finish)
