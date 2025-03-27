@@ -47,6 +47,30 @@ def detect_deadlock(allocation, request, available):
         return False  # No deadlock
     else:
         return True  # Deadlock detected
+# Resource Allocation Graph Visualization
+def draw_resource_allocation_graph(allocation, request, processes, resources):
+    G = nx.DiGraph()
+
+    # Add nodes for processes and resources
+    for process in processes:
+        G.add_node(process, type='process')
+    for resource in resources:
+        G.add_node(resource, type='resource')
+
+    # Add edges for allocation and request
+    for i in range(len(processes)):
+        for j in range(len(resources)):
+            if allocation[i][j] > 0:
+                G.add_edge(resources[j], processes[i])  # Resource -> Process
+            if request[i][j] > 0:
+                G.add_edge(processes[i], resources[j])  # Process -> Resource
+
+    # Draw the graph
+    pos = nx.spring_layout(G)
+    node_colors = ['lightblue' if G.nodes[node]['type'] == 'process' else 'lightgreen' for node in G.nodes]
+    nx.draw(G, pos, with_labels=True, node_color=node_colors, node_size=3000, font_size=10, font_weight='bold')
+    return G, pos
+
 
                     
 
