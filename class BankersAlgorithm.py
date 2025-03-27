@@ -40,6 +40,13 @@ def detect_deadlock(allocation, request, available):
                 work = [work[j] + allocation[i][j] for j in range(num_resources)]
                 finish[i] = True
                 found = True
+        if not found:
+            break
+
+    if all(finish):
+        return False  # No deadlock
+    else:
+        return True  # Deadlock detected
 
                     
 
