@@ -54,5 +54,7 @@ Integrating multi-threaded resource allocation simulation
 
 👩‍💻 Team Members
 Kangan Sharma 28
+
 Janvee 08
+
 Sahil Shaikh 07
