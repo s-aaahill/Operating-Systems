@@ -71,15 +71,18 @@ class DeadlockToolkitApp:
                 self.max_need_entry.get(),
                 self.allocation_entry.get()
             )
+            
             banker = BankersAlgorithm(processes, resources, available, max_need, allocation)
             is_safe, safe_sequence = banker.is_safe()
-
+            
             if is_safe:
                 messagebox.showinfo("Safe State", f"Safe sequence: {safe_sequence}")
             else:
-                messagebox.showwarning("Unsafe State", "System is in unsafe state")
+                messagebox.showwarning("Unsafe State", "System is in an unsafe state.")
         except ValueError as e:
             messagebox.showerror("Input Error", str(e))
+        except Exception as e:
+            messagebox.showerror("Unexpected Error", str(e))
 
     def detect_deadlock(self):
         try:
@@ -90,15 +93,23 @@ class DeadlockToolkitApp:
                 self.max_need_entry.get(),
                 self.allocation_entry.get()
             )
-            need = [[max_need[i][j] - allocation[i][j] for j in range(len(resources))] for i in range(len(processes))]
-            deadlock = detect_deadlock(allocation, need, available)
 
-            if deadlock:
+            # Generate request matrix from need matrix
+            need = [
+                [max_need[i][j] - allocation[i][j] for j in range(len(resources))]
+                for i in range(len(processes))
+            ]
+
+            deadlock_detected = detect_deadlock(allocation, need, available)
+
+            if deadlock_detected:
                 messagebox.showwarning("Deadlock Detected", "Deadlock has been detected!")
             else:
                 messagebox.showinfo("No Deadlock", "No deadlock detected.")
         except ValueError as e:
             messagebox.showerror("Input Error", str(e))
+        except Exception as e:
+            messagebox.showerror("Unexpected Error", str(e))
 
     def draw_graph(self):
         try:
@@ -109,51 +120,60 @@ class DeadlockToolkitApp:
                 self.max_need_entry.get(),
                 self.allocation_entry.get()
             )
-            need = [[max_need[i][j] - allocation[i][j] for j in range(len(resources))] for i in range(len(processes))]
-            self.graph, self.pos = draw_resource_allocation_graph(allocation, need, processes, resources)
-            messagebox.showinfo("Graph", "Graph drawn successfully.")
+
+            draw_resource_allocation_graph(processes, resources, allocation, available)
         except ValueError as e:
             messagebox.showerror("Input Error", str(e))
+        except Exception as e:
+            messagebox.showerror("Unexpected Error", str(e))
 
     def terminate_process(self):
-        process_name = simpledialog.askstring("Terminate Process", "Enter process name to terminate:")
-        if process_name:
-            messagebox.showinfo("Simulated", f"Process {process_name} terminated (simulation).")
-
-    def preempt_resource(self):
-        resource_name = simpledialog.askstring("Preempt Resource", "Enter resource name to preempt:")
-        if resource_name:
-            messagebox.showinfo("Simulated", f"Resource {resource_name} preempted (simulation).")
-
-    def export_graph(self):
         try:
-            if hasattr(self, 'graph') and hasattr(self, 'pos'):
-                file_path = filedialog.asksaveasfilename(defaultextension=".png")
-                if file_path:
-                    export_graph_to_file(self.graph, self.pos, file_path)
-                    messagebox.showinfo("Export", "Graph exported successfully.")
-            else:
-                messagebox.showwarning("Graph Not Drawn", "Please draw the graph first.")
-        except Exception as e:
-            messagebox.showerror("Export Error", str(e))
+            process_to_terminate = simpledialog.askstring("Terminate Process", "Enter process to terminate:")
+            if not process_to_terminate:
+                return
 
-    def export_results(self):
-        try:
-            file_path = filedialog.asksaveasfilename(defaultextension=".txt")
-            if file_path:
-                processes, resources, available, max_need, allocation = parse_input(
-                    self.processes_entry.get(),
-                    self.resources_entry.get(),
-                    self.available_entry.get(),
-                    self.max_need_entry.get(),
-                    self.allocation_entry.get()
-                )
-                banker = BankersAlgorithm(processes, resources, available, max_need, allocation)
-                is_safe, safe_sequence = banker.is_safe()
-                need = [[max_need[i][j] - allocation[i][j] for j in range(len(resources))] for i in range(len(processes))]
-                deadlock = detect_deadlock(allocation, need, available)
-                export_results_to_file(file_path, is_safe, safe_sequence, deadlock)
-                messagebox.showinfo("Export", "Results exported successfully.")
+            processes, resources, available, max_need, allocation = parse_input(
+                self.processes_entry.get(),
+                self.resources_entry.get(),
+                self.available_entry.get(),
+                self.max_need_entry.get(),
+                self.allocation_entry.get()
+            )
+
+            if process_to_terminate not in processes:
+                messagebox.showerror("Error", "Process not found.")
+                return
+
+            index = processes.index(process_to_terminate)
+
+            # Release resources allocated to the terminated process
+            for j in range(len(resources)):
+                available[j] += allocation[index][j]
+                allocation[index][j] = 0
+                max_need[index][j] = 0
+
+            # Update the input fields with new values
+            self.available_entry.delete(0, tk.END)
+            self.available_entry.insert(0, ','.join(map(str, available)))
+
+            allocation_str = ';'.join([','.join(map(str, row)) for row in allocation])
+            self.allocation_entry.delete(0, tk.END)
+            self.allocation_entry.insert(0, allocation_str)
+
+            max_need_str = ';'.join([','.join(map(str, row)) for row in max_need])
+            self.max_need_entry.delete(0, tk.END)
+            self.max_need_entry.insert(0, max_need_str)
+
+            messagebox.showinfo("Success", f"Process {process_to_terminate} terminated successfully.")
         except ValueError as e:
             messagebox.showerror("Input Error", str(e))
+        except Exception as e:
+            messagebox.showerror("Unexpected Error", str(e))
 
+    def preempt_resource(self):
+        try:
+            resource_to_preempt = simpledialog.askstring("Preempt Resource", "Enter resource to preempt:")
+           
+::contentReference[oaicite:0]{index=0}
+ 
