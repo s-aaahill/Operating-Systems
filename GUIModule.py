@@ -62,8 +62,6 @@ class DeadlockToolkitApp:
             button = ttk.Button(buttons_frame, text=text, command=command)
             button.grid(row=row, column=col, padx=10, pady=10)
 
-    # All the action methods (check_safe_state, detect_deadlock, etc.) go here
-    # They should use the imported modules for functionality
     def check_safe_state(self):
         try:
             processes, resources, available, max_need, allocation = parse_input(
@@ -73,39 +71,89 @@ class DeadlockToolkitApp:
                 self.max_need_entry.get(),
                 self.allocation_entry.get()
             )
-            
             banker = BankersAlgorithm(processes, resources, available, max_need, allocation)
             is_safe, safe_sequence = banker.is_safe()
-            
+
             if is_safe:
                 messagebox.showinfo("Safe State", f"Safe sequence: {safe_sequence}")
             else:
                 messagebox.showwarning("Unsafe State", "System is in unsafe state")
         except ValueError as e:
             messagebox.showerror("Input Error", str(e))
+
     def detect_deadlock(self):
-    try:
-        processes, resources, available, max_need, allocation = parse_input(
-            self.processes_entry.get(),
-            self.resources_entry.get(),
-            self.available_entry.get(),
-            self.max_need_entry.get(),
-            self.allocation_entry.get()
-        )
-        # Generate request matrix from need matrix (example)
-        need = [
-            [max_need[i][j] - allocation[i][j] for j in range(len(resources))]
-            for i in range(len(processes))
-        ]
-        
-        deadlock_detected = detect_deadlock(allocation, need, available)
+        try:
+            processes, resources, available, max_need, allocation = parse_input(
+                self.processes_entry.get(),
+                self.resources_entry.get(),
+                self.available_entry.get(),
+                self.max_need_entry.get(),
+                self.allocation_entry.get()
+            )
+            need = [[max_need[i][j] - allocation[i][j] for j in range(len(resources))] for i in range(len(processes))]
+            deadlock = detect_deadlock(allocation, need, available)
 
-        if deadlock_detected:
-            messagebox.showwarning("Deadlock Detected", "Deadlock has been detected!")
-        else:
-            messagebox.showinfo("No Deadlock", "No deadlock detected.")
-    
-    except ValueError as e:
-        messagebox.showerror("Input Error", str(e))
+            if deadlock:
+                messagebox.showwarning("Deadlock Detected", "Deadlock has been detected!")
+            else:
+                messagebox.showinfo("No Deadlock", "No deadlock detected.")
+        except ValueError as e:
+            messagebox.showerror("Input Error", str(e))
 
-    # Other methods follow similar pattern...
+    def draw_graph(self):
+        try:
+            processes, resources, available, max_need, allocation = parse_input(
+                self.processes_entry.get(),
+                self.resources_entry.get(),
+                self.available_entry.get(),
+                self.max_need_entry.get(),
+                self.allocation_entry.get()
+            )
+            need = [[max_need[i][j] - allocation[i][j] for j in range(len(resources))] for i in range(len(processes))]
+            self.graph, self.pos = draw_resource_allocation_graph(allocation, need, processes, resources)
+            messagebox.showinfo("Graph", "Graph drawn successfully.")
+        except ValueError as e:
+            messagebox.showerror("Input Error", str(e))
+
+    def terminate_process(self):
+        process_name = simpledialog.askstring("Terminate Process", "Enter process name to terminate:")
+        if process_name:
+            messagebox.showinfo("Simulated", f"Process {process_name} terminated (simulation).")
+
+    def preempt_resource(self):
+        resource_name = simpledialog.askstring("Preempt Resource", "Enter resource name to preempt:")
+        if resource_name:
+            messagebox.showinfo("Simulated", f"Resource {resource_name} preempted (simulation).")
+
+    def export_graph(self):
+        try:
+            if hasattr(self, 'graph') and hasattr(self, 'pos'):
+                file_path = filedialog.asksaveasfilename(defaultextension=".png")
+                if file_path:
+                    export_graph_to_file(self.graph, self.pos, file_path)
+                    messagebox.showinfo("Export", "Graph exported successfully.")
+            else:
+                messagebox.showwarning("Graph Not Drawn", "Please draw the graph first.")
+        except Exception as e:
+            messagebox.showerror("Export Error", str(e))
+
+    def export_results(self):
+        try:
+            file_path = filedialog.asksaveasfilename(defaultextension=".txt")
+            if file_path:
+                processes, resources, available, max_need, allocation = parse_input(
+                    self.processes_entry.get(),
+                    self.resources_entry.get(),
+                    self.available_entry.get(),
+                    self.max_need_entry.get(),
+                    self.allocation_entry.get()
+                )
+                banker = BankersAlgorithm(processes, resources, available, max_need, allocation)
+                is_safe, safe_sequence = banker.is_safe()
+                need = [[max_need[i][j] - allocation[i][j] for j in range(len(resources))] for i in range(len(processes))]
+                deadlock = detect_deadlock(allocation, need, available)
+                export_results_to_file(file_path, is_safe, safe_sequence, deadlock)
+                messagebox.showinfo("Export", "Results exported successfully.")
+        except ValueError as e:
+            messagebox.showerror("Input Error", str(e))
+
