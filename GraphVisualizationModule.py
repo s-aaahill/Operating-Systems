@@ -39,7 +39,7 @@ def draw_resource_allocation_graph(allocation, request, processes, resources):
         G, pos,
         edgelist=G.edges(),
         arrowstyle='->',
-        arrowsize=25,
+        arrowsize=70,
         edge_color='black',
         connectionstyle='arc3,rad=0.1'
     )
