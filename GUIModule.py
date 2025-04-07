@@ -119,12 +119,18 @@ class DeadlockToolkitApp:
                 self.max_need_entry.get(),
                 self.allocation_entry.get()
             )
-
-            draw_resource_allocation_graph(processes, resources, allocation, available)
+    
+            request = [
+                [max_need[i][j] - allocation[i][j] for j in range(len(resources))]
+                for i in range(len(processes))
+            ]
+    
+            draw_resource_allocation_graph(allocation, request, processes, resources)
         except ValueError as e:
             messagebox.showerror("Input Error", str(e))
         except Exception as e:
             messagebox.showerror("Unexpected Error", str(e))
+
 
     def terminate_process(self):
         try:
