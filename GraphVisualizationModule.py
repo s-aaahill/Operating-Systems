@@ -16,10 +16,10 @@ def draw_resource_allocation_graph(allocation, request, processes, resources):
         for j, resource in enumerate(resources):
             if allocation[i][j] > 0:
                 G.add_edge(resource, process)
-                edge_labels[(resource, process)] = f"A:{allocation[i][j]}"
+                #edge_labels[(resource, process)] = f"A:{allocation[i][j]}"
             if request[i][j] > 0:
                 G.add_edge(process, resource)
-                edge_labels[(process, resource)] = f"R:{request[i][j]}"
+                #edge_labels[(process, resource)] = f"R:{request[i][j]}"
 
     # Position nodes in bipartite layout
     pos = nx.bipartite_layout(G, nodes=[n for n in G.nodes if n in processes])
