@@ -5,54 +5,46 @@ class BankersAlgorithm:
         self.available = available
         self.max_need = max_need
         self.allocation = allocation
-        self.need = self._calculate_need()
-
-    def _calculate_need(self):
-        # Fix loop order (i first, then j)
-        return [
-            [self.max_need[i][j] - self.allocation[i][j] 
-            for j in range(len(self.resources))]
-            for i in range(len(self.processes))
-        ]
+        self.n = len(processes)
+        self.m = len(resources)
 
     def is_safe(self):
-        work = self.available.copy()
-        finish = [False] * len(self.processes)
+        need = [[self.max_need[i][j] - self.allocation[i][j] for j in range(self.m)] for i in range(self.n)]
+        work = self.available[:]
+        finish = [False] * self.n
         safe_sequence = []
 
-        while True:
+        while len(safe_sequence) < self.n:
             found = False
-            for i in range(len(self.processes)):
-                if not finish[i] and all(self.need[i][j] <= work[j] for j in range(len(self.resources))):
-                    # Allocate resources
-                    work = [work[j] + self.allocation[i][j] for j in range(len(self.resources))]
+            for i in range(self.n):
+                if not finish[i] and all(need[i][j] <= work[j] for j in range(self.m)):
+                    for j in range(self.m):
+                        work[j] += self.allocation[i][j]
                     finish[i] = True
                     safe_sequence.append(self.processes[i])
                     found = True
-
+                    break
             if not found:
-                break
+                return False, []
+        return True, safe_sequence
 
-        # Return True if all processes could finish, otherwise False
-        return (all(finish), safe_sequence if all(finish) else [])
 
-def detect_deadlock(allocation, request, available):
-    num_processes = len(allocation)
-    num_resources = len(available)
-    work = available.copy()
-    finish = [False] * num_processes
+def detect_deadlock(allocation, need, available):
+    n = len(allocation)
+    m = len(available)
+    finish = [False] * n
+    work = available[:]
 
     while True:
         found = False
-        for i in range(num_processes):
-            # Fix: Check if request <= work AND request <= need
-            if not finish[i] and all(request[i][j] <= work[j] for j in range(num_resources)):
-                work = [work[j] + allocation[i][j] for j in range(num_resources)]
+        for i in range(n):
+            if not finish[i] and all(need[i][j] <= work[j] for j in range(m)):
+                for j in range(m):
+                    work[j] += allocation[i][j]
                 finish[i] = True
                 found = True
-
+                break
         if not found:
             break
 
-    # If all processes finished, no deadlock
     return not all(finish)
