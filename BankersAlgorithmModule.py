@@ -39,7 +39,7 @@ def detect_deadlock(allocation, request, available):
     n = len(allocation)
     m = len(available)
     work = available[:]
-    finish = [all(allocation[i][j] == 0 for j in range(m)) for i in range(n)]
+    finish = [False] * n
 
     while True:
         found = False
@@ -52,4 +52,4 @@ def detect_deadlock(allocation, request, available):
         if not found:
             break
 
-    return not all(finish)
+    return not all(finish)  # True means deadlock
