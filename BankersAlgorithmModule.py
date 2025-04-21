@@ -23,28 +23,26 @@ class BankersAlgorithm:
                     finish[i] = True
                     safe_sequence.append(self.processes[i])
                     found = True
-                    break
-            if not found:
+            if not found:  # No process found that can be satisfied
                 return False, []
         return True, safe_sequence
 
 
-def detect_deadlock(allocation, need, available):
+def detect_deadlock(allocation, request, available):
     n = len(allocation)
     m = len(available)
-    finish = [False] * n
     work = available[:]
+    finish = [all(allocation[i][j] == 0 for j in range(m)) for i in range(n)]
 
     while True:
         found = False
         for i in range(n):
-            if not finish[i] and all(need[i][j] <= work[j] for j in range(m)):
+            if not finish[i] and all(request[i][j] <= work[j] for j in range(m)):
                 for j in range(m):
                     work[j] += allocation[i][j]
                 finish[i] = True
                 found = True
-                break
         if not found:
             break
 
-    return not all(finish)
+    return not all(finish)  # Returns True if deadlock exists
