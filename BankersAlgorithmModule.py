@@ -35,27 +35,21 @@ class BankersAlgorithm:
                 return False, []
         return True, safe_sequence
 
-
-# Deadlock-prone input test
-processes = ["P0", "P1", "P2"]
-resources = ["R0", "R1"]
-available = [0, 0]
-
-allocation = [
-    [1, 0],  # P0 holds R0
-    [0, 1],  # P1 holds R1
-    [0, 0],  # P2 holds nothing
-]
-
-max_need = [
-    [1, 1],  # P0 needs 1 more R1
-    [1, 1],  # P1 needs 1 more R0
-    [1, 1],  # P2 needs both
-]
-
-banker = BankersAlgorithm(processes, resources, available, max_need, allocation)
-is_safe, sequence = banker.is_safe()
-
-print("\nSafe state?:", is_safe)
-print("Safe sequence:" if is_safe else "Unsafe system. Deadlock likely.")
-print(sequence)
+    def detect_deadlock(allocation, request, available):
+        n = len(allocation)
+        m = len(available)
+        work = available[:]
+        finish = [all(allocation[i][j] == 0 for j in range(m)) for i in range(n)]
+    
+        while True:
+            found = False
+            for i in range(n):
+                if not finish[i] and all(request[i][j] <= work[j] for j in range(m)):
+                    for j in range(m):
+                        work[j] += allocation[i][j]
+                    finish[i] = True
+                    found = True
+            if not found:
+                break
+    
+        return not all(finish)
