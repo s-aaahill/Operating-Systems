@@ -34,22 +34,22 @@ class BankersAlgorithm:
                 print("No eligible process found in this iteration.")
                 return False, []
         return True, safe_sequence
+        
+def detect_deadlock(allocation, request, available):
+    n = len(allocation)
+    m = len(available)
+    work = available[:]
+    finish = [all(allocation[i][j] == 0 for j in range(m)) for i in range(n)]
 
-    def detect_deadlock(allocation, request, available):
-        n = len(allocation)
-        m = len(available)
-        work = available[:]
-        finish = [all(allocation[i][j] == 0 for j in range(m)) for i in range(n)]
-    
-        while True:
-            found = False
-            for i in range(n):
-                if not finish[i] and all(request[i][j] <= work[j] for j in range(m)):
-                    for j in range(m):
-                        work[j] += allocation[i][j]
-                    finish[i] = True
-                    found = True
-            if not found:
-                break
-    
-        return not all(finish)
+    while True:
+        found = False
+        for i in range(n):
+            if not finish[i] and all(request[i][j] <= work[j] for j in range(m)):
+                for j in range(m):
+                    work[j] += allocation[i][j]
+                finish[i] = True
+                found = True
+        if not found:
+            break
+
+    return not all(finish)
